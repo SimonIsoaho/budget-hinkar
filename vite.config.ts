@@ -7,7 +7,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icons/*.png', 'favicon.svg'],
+      includeAssets: ['icons/*.png', 'favicon.svg', 'icon.svg'],
       manifest: {
         name: 'Budgethinkar',
         short_name: 'Budgethinkar',
