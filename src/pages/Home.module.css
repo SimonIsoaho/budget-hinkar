@@ -1,0 +1,78 @@
+.list {
+  padding: var(--spacing-lg);
+  padding-bottom: var(--spacing-xl);
+  flex: 1;
+}
+
+.summary {
+  margin-bottom: var(--spacing-lg);
+}
+
+.householdName {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.codeLabel {
+  margin-top: var(--spacing-xs);
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  letter-spacing: 1px;
+}
+
+.totalCard {
+  margin-top: var(--spacing-md);
+  background-color: var(--color-primary-light);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+}
+
+.totalLabel {
+  font-size: 14px;
+  color: var(--color-primary-dark);
+  font-weight: 600;
+}
+
+.totalAmount {
+  margin-top: var(--spacing-xs);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-primary-dark);
+}
+
+.empty {
+  text-align: center;
+  padding: var(--spacing-xl) var(--spacing-md);
+}
+
+.emptyTitle {
+  margin: 0 0 var(--spacing-sm);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.emptyBody {
+  margin: 0;
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.footer {
+  margin-top: var(--spacing-sm);
+}
+
+.leaveButton {
+  margin-top: var(--spacing-sm);
+}
+
+.headerAction {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 16px;
+  padding: var(--spacing-sm);
+}

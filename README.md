@@ -1,14 +1,15 @@
 # Budgethinkar
 
-En enkel iOS-app (React Native + Expo) för att hålla koll på gemensamma budgethinkar tillsammans med din sambo. Data synkas i realtid via Supabase.
+En enkel webbapp (React PWA) för att hålla koll på gemensamma budgethinkar tillsammans med din sambo. Data synkas i realtid via Supabase.
 
 ## Funktioner
 
 - Skapa ett hushåll och få en delningskod
-- Din sambo går med med samma kod på sin telefon
+- Din sambo går med med samma kod i webbläsaren
 - Lägg till hinkar med namn (t.ex. Mat, Semester)
 - Lägg till eller dra ifrån belopp i varje hink
-- Ändringar syns direkt på båda telefonerna
+- Ändringar syns direkt på båda enheterna
+- Installera som PWA på mobil eller dator
 
 ## Kom igång
 
@@ -29,22 +30,18 @@ cp .env.example .env
 Fyll i dina Supabase-värden i `.env`:
 
 ```
-EXPO_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
-EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+VITE_SUPABASE_URL=https://xxxxx.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJ...
 ```
 
 ### 3. Starta appen
 
 ```bash
 npm install
-npm run ios
+npm run dev
 ```
 
-Du kan också skanna QR-koden med **Expo Go** på iPhone:
-
-```bash
-npm start
-```
+Öppna [http://localhost:5173](http://localhost:5173) i webbläsaren.
 
 ## Dela med din sambo
 
@@ -52,21 +49,27 @@ npm start
 2. Skicka koden (8 tecken) till din sambo
 3. Din sambo väljer **Gå med med kod** och matar in koden
 
-## Bygga för TestFlight/App Store
+## Installera som PWA
 
-```bash
-npx eas build --platform ios
-```
+- **iPhone (Safari):** Dela → Lägg till på hemskärmen
+- **Android (Chrome):** Meny → Installera app / Lägg till på startskärmen
+- **Desktop (Chrome/Edge):** Installera-ikonen i adressfältet
 
-Kräver ett [Expo](https://expo.dev)-konto och Apple Developer-konto.
+## Deploy till Vercel
+
+1. Pusha till GitHub och importera repot i [Vercel](https://vercel.com)
+2. Lägg till miljövariablerna `VITE_SUPABASE_URL` och `VITE_SUPABASE_ANON_KEY`
+3. Deploy — Vercel kör `npm run build` automatiskt
 
 ## Projektstruktur
 
 ```
-app/           Skärmar (Expo Router)
-components/    UI-komponenter
-lib/           Supabase, lagring, hjälpfunktioner
-supabase/      SQL-schema
+src/
+  pages/        Skärmar (React Router)
+  components/   UI-komponenter
+  lib/          Supabase, lagring, hjälpfunktioner
+supabase/       SQL-schema
+public/         PWA-ikoner och favicon
 ```
 
 ## Säkerhet
