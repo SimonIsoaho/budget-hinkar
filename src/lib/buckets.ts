@@ -76,6 +76,7 @@ export async function insertBucketTransaction(
       description: payload.description,
       actor_name: payload.actor_name,
       reverses_id: payload.reverses_id ?? null,
+      transfer_id: payload.transfer_id ?? null,
     })
     .select()
     .single();
@@ -94,6 +95,7 @@ function mapTransactionRow(row: Record<string, unknown>): BucketTransaction {
     description: (row.description as string | null) ?? null,
     actor_name: (row.actor_name as string | null) ?? null,
     reverses_id: (row.reverses_id as string | null) ?? null,
+    transfer_id: (row.transfer_id as string | null) ?? null,
     created_at: row.created_at as string,
   };
 }
@@ -171,6 +173,69 @@ export async function undoTransaction(
     return { bucket: updatedBucket, transaction };
   } catch (error) {
     throw new HistorySaveError(updatedBucket, pendingHistory, error);
+  }
+}
+
+export class TransferHistoryError extends Error {
+  buckets: Bucket[];
+  pendingHistory: HistoryInsertPayload[];
+
+  constructor(
+    buckets: Bucket[],
+    pendingHistory: HistoryInsertPayload[],
+    cause?: unknown,
+  ) {
+    super('Saldo uppdaterades men historiken misslyckades');
+    this.name = 'TransferHistoryError';
+    this.buckets = buckets;
+    this.pendingHistory = pendingHistory;
+    if (cause instanceof Error) {
+      this.cause = cause;
+    }
+  }
+}
+
+export async function transferBetweenBuckets(
+  from: Bucket,
+  to: Bucket,
+  amount: number,
+  options: { description?: string; actorName: string },
+): Promise<{ from: Bucket; to: Bucket }> {
+  if (from.id === to.id) {
+    throw new Error('Välj två olika hinkar.');
+  }
+
+  const transferId = crypto.randomUUID();
+  const custom = normalizeDescription(options.description);
+  const actorName = options.actorName.trim() || null;
+
+  const fromPayload: HistoryInsertPayload = {
+    bucket_id: from.id,
+    amount,
+    direction: 'remove',
+    description: custom ?? `Flytt till ${to.name}`,
+    actor_name: actorName,
+    transfer_id: transferId,
+  };
+
+  const toPayload: HistoryInsertPayload = {
+    bucket_id: to.id,
+    amount,
+    direction: 'add',
+    description: custom ?? `Flytt från ${from.name}`,
+    actor_name: actorName,
+    transfer_id: transferId,
+  };
+
+  const updatedFrom = await updateBucketBalance(from, -amount);
+  const updatedTo = await updateBucketBalance(to, amount);
+
+  try {
+    await insertBucketTransaction(fromPayload);
+    await insertBucketTransaction(toPayload);
+    return { from: updatedFrom, to: updatedTo };
+  } catch (error) {
+    throw new TransferHistoryError([updatedFrom, updatedTo], [fromPayload, toPayload], error);
   }
 }
 

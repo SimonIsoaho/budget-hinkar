@@ -55,6 +55,7 @@ Om du redan har ett Supabase-projekt, kör dessa SQL-filer i SQL Editor (i ordni
 
 1. `supabase/migrations/2026-07-28-bucket-transactions.sql` — historiktabell
 2. `supabase/migrations/2026-07-28-ux-improvements.sql` — namn på poster + ångra
+3. `supabase/migrations/2026-07-28-transfer-id.sql` — flyttar mellan hinkar
 
 Befintliga saldon ändras inte.
 

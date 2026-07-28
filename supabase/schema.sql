@@ -41,11 +41,16 @@ create table if not exists bucket_transactions (
   description text,
   actor_name text,
   reverses_id uuid references bucket_transactions(id),
+  transfer_id uuid,
   created_at timestamptz not null default now()
 );
 
 create index if not exists bucket_transactions_bucket_id_created_at_idx
   on bucket_transactions (bucket_id, created_at desc);
+
+create index if not exists bucket_transactions_transfer_id_idx
+  on bucket_transactions (transfer_id)
+  where transfer_id is not null;
 
 alter table bucket_transactions enable row level security;
 

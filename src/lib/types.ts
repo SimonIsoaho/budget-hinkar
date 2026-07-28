@@ -24,7 +24,12 @@ export type BucketTransaction = {
   description: string | null;
   actor_name: string | null;
   reverses_id: string | null;
+  transfer_id: string | null;
   created_at: string;
+};
+
+export type ActivityItem = BucketTransaction & {
+  bucket_name: string;
 };
 
 export type HistoryInsertPayload = {
@@ -34,4 +39,10 @@ export type HistoryInsertPayload = {
   description: string | null;
   actor_name: string | null;
   reverses_id?: string | null;
+  transfer_id?: string | null;
+};
+
+export type BudgetPeriod = {
+  start: Date;
+  end: Date;
 };

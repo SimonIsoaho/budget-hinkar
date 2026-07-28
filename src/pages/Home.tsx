@@ -5,6 +5,7 @@ import { BucketCard } from '../components/BucketCard';
 import { Button } from '../components/Button';
 import { CenterMessage, Layout } from '../components/Layout';
 import { TextModal } from '../components/TextModal';
+import { TransferModal } from '../components/TransferModal';
 import {
   adjustBucketBalance,
   createBucket,
@@ -12,8 +13,13 @@ import {
   fetchBuckets,
   subscribeToBuckets,
 } from '../lib/buckets';
-import { formatAmount } from '../lib/format';
+import { formatAmount, formatSignedAmount, formatTransactionDate } from '../lib/format';
 import { getHousehold } from '../lib/household';
+import {
+  formatPeriodLabel,
+  getCurrentPeriod,
+  summarizePeriodCashflow,
+} from '../lib/period';
 import { shareCode } from '../lib/share';
 import {
   clearStoredHouseholdId,
@@ -21,7 +27,12 @@ import {
   getStoredHouseholdId,
   setDisplayName,
 } from '../lib/storage';
-import type { Bucket, Household } from '../lib/types';
+import {
+  fetchHouseholdActivity,
+  fetchHouseholdTransactionsInRange,
+  subscribeToAllTransactions,
+} from '../lib/transactions';
+import type { ActivityItem, Bucket, Household } from '../lib/types';
 import styles from './Home.module.css';
 
 export function HomePage() {
@@ -33,8 +44,26 @@ export function HomePage() {
   const [selectedBucket, setSelectedBucket] = useState<Bucket | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showNameModal, setShowNameModal] = useState(false);
+  const [showTransferModal, setShowTransferModal] = useState(false);
   const [addingBucket, setAddingBucket] = useState(false);
   const [displayName, setDisplayNameState] = useState<string | null>(() => getDisplayName());
+  const [periodIn, setPeriodIn] = useState(0);
+  const [periodOut, setPeriodOut] = useState(0);
+  const [activity, setActivity] = useState<ActivityItem[]>([]);
+  const period = getCurrentPeriod();
+  const periodLabel = formatPeriodLabel(period);
+
+  const refreshInsights = useCallback(async (householdId: string) => {
+    const { start, end } = getCurrentPeriod();
+    const [periodTx, recent] = await Promise.all([
+      fetchHouseholdTransactionsInRange(householdId, start, end),
+      fetchHouseholdActivity(householdId, 5),
+    ]);
+    const summary = summarizePeriodCashflow(periodTx);
+    setPeriodIn(summary.incoming);
+    setPeriodOut(summary.outgoing);
+    setActivity(recent);
+  }, []);
 
   const loadData = useCallback(async () => {
     const householdId = getStoredHouseholdId();
@@ -56,8 +85,9 @@ export function HomePage() {
 
     setHousehold(householdData);
     setBuckets(bucketData);
+    await refreshInsights(householdData.id);
     setLoading(false);
-  }, [navigate]);
+  }, [navigate, refreshInsights]);
 
   useEffect(() => {
     loadData().catch((err) => {
@@ -69,12 +99,21 @@ export function HomePage() {
   useEffect(() => {
     if (!household) return undefined;
 
-    return subscribeToBuckets(household.id, () => {
+    const refresh = () => {
       fetchBuckets(household.id)
         .then(setBuckets)
         .catch(() => undefined);
-    });
-  }, [household]);
+      refreshInsights(household.id).catch(() => undefined);
+    };
+
+    const unsubBuckets = subscribeToBuckets(household.id, refresh);
+    const unsubTx = subscribeToAllTransactions(refresh);
+
+    return () => {
+      unsubBuckets();
+      unsubTx();
+    };
+  }, [household, refreshInsights]);
 
   const handleShareCode = async () => {
     if (!household) return;
@@ -117,18 +156,33 @@ export function HomePage() {
     setBuckets((current) => current.map((item) => (item.id === updated.id ? updated : item)));
     setSelectedBucket(updated);
     setDisplayNameState(getDisplayName());
+    if (household) refreshInsights(household.id).catch(() => undefined);
     return updated;
   };
 
   const handleBucketUpdated = (bucket: Bucket) => {
     setBuckets((current) => current.map((item) => (item.id === bucket.id ? bucket : item)));
     setSelectedBucket(bucket);
+    if (household) refreshInsights(household.id).catch(() => undefined);
+  };
+
+  const handleTransferred = (from: Bucket, to: Bucket) => {
+    setBuckets((current) =>
+      current.map((item) => {
+        if (item.id === from.id) return from;
+        if (item.id === to.id) return to;
+        return item;
+      }),
+    );
+    setDisplayNameState(getDisplayName());
+    if (household) refreshInsights(household.id).catch(() => undefined);
   };
 
   const handleDelete = async (bucket: Bucket) => {
     await deleteBucket(bucket.id);
     setBuckets((current) => current.filter((item) => item.id !== bucket.id));
     setSelectedBucket(null);
+    if (household) refreshInsights(household.id).catch(() => undefined);
   };
 
   const handleLeave = () => {
@@ -139,6 +193,11 @@ export function HomePage() {
 
     clearStoredHouseholdId();
     navigate('/setup', { replace: true });
+  };
+
+  const openActivityBucket = (item: ActivityItem) => {
+    const bucket = buckets.find((b) => b.id === item.bucket_id);
+    if (bucket) setSelectedBucket(bucket);
   };
 
   const totalBalance = buckets.reduce((sum, bucket) => sum + bucket.balance, 0);
@@ -185,6 +244,56 @@ export function HomePage() {
             <div className={styles.totalLabel}>Totalt i hinkarna</div>
             <div className={styles.totalAmount}>{formatAmount(totalBalance)}</div>
           </div>
+
+          <div className={styles.periodCard}>
+            <div className={styles.periodTitle}>Denna period</div>
+            <div className={styles.periodRange}>{periodLabel}</div>
+            <div className={styles.periodStats}>
+              <div>
+                <div className={styles.periodStatLabel}>In</div>
+                <div className={styles.periodIn}>{formatAmount(periodIn)}</div>
+              </div>
+              <div>
+                <div className={styles.periodStatLabel}>Ut</div>
+                <div className={styles.periodOut}>{formatAmount(periodOut)}</div>
+              </div>
+            </div>
+          </div>
+
+          <section className={styles.activity}>
+            <h3 className={styles.activityTitle}>Senaste</h3>
+            {activity.length === 0 ? (
+              <p className={styles.activityEmpty}>Inga ändringar ännu</p>
+            ) : (
+              <ul className={styles.activityList}>
+                {activity.map((item) => (
+                  <li key={item.id}>
+                    <button
+                      type="button"
+                      className={styles.activityItem}
+                      onClick={() => openActivityBucket(item)}
+                    >
+                      <span className={styles.activityMain}>
+                        <span className={styles.activityActor}>{item.actor_name ?? 'Okänd'}</span>
+                        <span
+                          className={[
+                            styles.activityAmount,
+                            item.direction === 'add' ? styles.periodIn : styles.periodOut,
+                          ].join(' ')}
+                        >
+                          {formatSignedAmount(item.amount, item.direction)}
+                        </span>
+                        <span className={styles.activityBucket}>{item.bucket_name}</span>
+                      </span>
+                      <span className={styles.activityDate}>
+                        {formatTransactionDate(item.created_at)}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
         </div>
 
         {buckets.length === 0 ? (
@@ -202,6 +311,13 @@ export function HomePage() {
 
         <div className={styles.footer}>
           <Button title="Lägg till hink" onClick={() => setShowAddModal(true)} />
+          <Button
+            title="Flytta mellan hinkar"
+            variant="secondary"
+            onClick={() => setShowTransferModal(true)}
+            disabled={buckets.length < 2}
+            className={styles.leaveButton}
+          />
           <Button
             title="Lämna hushåll"
             variant="secondary"
@@ -228,6 +344,13 @@ export function HomePage() {
         confirmLabel="Spara"
         onClose={() => setShowNameModal(false)}
         onConfirm={handleSaveDisplayName}
+      />
+
+      <TransferModal
+        visible={showTransferModal}
+        buckets={buckets}
+        onClose={() => setShowTransferModal(false)}
+        onTransferred={handleTransferred}
       />
 
       <AdjustModal
