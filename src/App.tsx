@@ -1,11 +1,18 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { InstallPrompt } from './components/InstallPrompt';
+import { OfflineBanner } from './components/OfflineBanner';
+import { useOnline } from './lib/online';
 import { HomePage } from './pages/Home';
 import { IndexPage } from './pages/Index';
 import { SetupPage } from './pages/Setup';
 
 export function App() {
+  const online = useOnline();
+
   return (
     <BrowserRouter>
+      <OfflineBanner online={online} />
+      <InstallPrompt />
       <Routes>
         <Route path="/" element={<IndexPage />} />
         <Route path="/setup" element={<SetupPage />} />

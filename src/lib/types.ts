@@ -22,5 +22,16 @@ export type BucketTransaction = {
   amount: number;
   direction: TransactionDirection;
   description: string | null;
+  actor_name: string | null;
+  reverses_id: string | null;
   created_at: string;
+};
+
+export type HistoryInsertPayload = {
+  bucket_id: string;
+  amount: number;
+  direction: TransactionDirection;
+  description: string | null;
+  actor_name: string | null;
+  reverses_id?: string | null;
 };

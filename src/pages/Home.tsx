@@ -15,7 +15,12 @@ import {
 import { formatAmount } from '../lib/format';
 import { getHousehold } from '../lib/household';
 import { shareCode } from '../lib/share';
-import { clearStoredHouseholdId, getStoredHouseholdId } from '../lib/storage';
+import {
+  clearStoredHouseholdId,
+  getDisplayName,
+  getStoredHouseholdId,
+  setDisplayName,
+} from '../lib/storage';
 import type { Bucket, Household } from '../lib/types';
 import styles from './Home.module.css';
 
@@ -27,7 +32,9 @@ export function HomePage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedBucket, setSelectedBucket] = useState<Bucket | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showNameModal, setShowNameModal] = useState(false);
   const [addingBucket, setAddingBucket] = useState(false);
+  const [displayName, setDisplayNameState] = useState<string | null>(() => getDisplayName());
 
   const loadData = useCallback(async () => {
     const householdId = getStoredHouseholdId();
@@ -93,15 +100,29 @@ export function HomePage() {
     }
   };
 
+  const handleSaveDisplayName = async (name: string) => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    setDisplayName(trimmed);
+    setDisplayNameState(trimmed);
+    setShowNameModal(false);
+  };
+
   const handleAdjust = async (
     bucket: Bucket,
     delta: number,
-    description?: string,
+    options: { description?: string; actorName: string },
   ): Promise<Bucket> => {
-    const { bucket: updated } = await adjustBucketBalance(bucket, delta, description);
+    const { bucket: updated } = await adjustBucketBalance(bucket, delta, options);
     setBuckets((current) => current.map((item) => (item.id === updated.id ? updated : item)));
     setSelectedBucket(updated);
+    setDisplayNameState(getDisplayName());
     return updated;
+  };
+
+  const handleBucketUpdated = (bucket: Bucket) => {
+    setBuckets((current) => current.map((item) => (item.id === bucket.id ? bucket : item)));
+    setSelectedBucket(bucket);
   };
 
   const handleDelete = async (bucket: Bucket) => {
@@ -153,6 +174,13 @@ export function HomePage() {
         <div className={styles.summary}>
           <h2 className={styles.householdName}>{household?.name}</h2>
           <p className={styles.codeLabel}>Delningskod: {household?.code}</p>
+          <button
+            type="button"
+            className={styles.nameButton}
+            onClick={() => setShowNameModal(true)}
+          >
+            {displayName ? `Ditt namn: ${displayName}` : 'Ange ditt namn'}
+          </button>
           <div className={styles.totalCard}>
             <div className={styles.totalLabel}>Totalt i hinkarna</div>
             <div className={styles.totalAmount}>{formatAmount(totalBalance)}</div>
@@ -193,11 +221,21 @@ export function HomePage() {
         onConfirm={handleAddBucket}
       />
 
+      <TextModal
+        visible={showNameModal}
+        title="Ditt namn"
+        placeholder="T.ex. Simon"
+        confirmLabel="Spara"
+        onClose={() => setShowNameModal(false)}
+        onConfirm={handleSaveDisplayName}
+      />
+
       <AdjustModal
         visible={selectedBucket !== null}
         bucket={selectedBucket}
         onClose={() => setSelectedBucket(null)}
         onAdjust={handleAdjust}
+        onBucketUpdated={handleBucketUpdated}
         onDelete={handleDelete}
       />
     </Layout>

@@ -51,9 +51,12 @@ npm run dev
 
 ## Historik (migration)
 
-Om du redan har ett Supabase-projekt, kör SQL-filen
-`supabase/migrations/2026-07-28-bucket-transactions.sql` i SQL Editor.
-Det skapar historiktabellen utan att ändra befintliga saldon.
+Om du redan har ett Supabase-projekt, kör dessa SQL-filer i SQL Editor (i ordning):
+
+1. `supabase/migrations/2026-07-28-bucket-transactions.sql` — historiktabell
+2. `supabase/migrations/2026-07-28-ux-improvements.sql` — namn på poster + ångra
+
+Befintliga saldon ändras inte.
 
 ## Installera som PWA
 

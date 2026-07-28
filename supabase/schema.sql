@@ -39,6 +39,8 @@ create table if not exists bucket_transactions (
   amount numeric(12, 2) not null check (amount > 0),
   direction text not null check (direction in ('add', 'remove')),
   description text,
+  actor_name text,
+  reverses_id uuid references bucket_transactions(id),
   created_at timestamptz not null default now()
 );
 

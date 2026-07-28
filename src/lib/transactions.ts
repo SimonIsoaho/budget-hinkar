@@ -8,6 +8,8 @@ function mapTransaction(row: Record<string, unknown>): BucketTransaction {
     amount: Number(row.amount),
     direction: row.direction as BucketTransaction['direction'],
     description: (row.description as string | null) ?? null,
+    actor_name: (row.actor_name as string | null) ?? null,
+    reverses_id: (row.reverses_id as string | null) ?? null,
     created_at: row.created_at as string,
   };
 }
@@ -24,6 +26,24 @@ export async function fetchBucketTransactions(
   if (error) throw error;
 
   return (data ?? []).map((row) => mapTransaction(row as Record<string, unknown>));
+}
+
+export function getUndoableTransaction(
+  transactions: BucketTransaction[],
+): BucketTransaction | null {
+  const reversedIds = new Set(
+    transactions
+      .map((tx) => tx.reverses_id)
+      .filter((id): id is string => typeof id === 'string' && id.length > 0),
+  );
+
+  for (const tx of transactions) {
+    if (tx.reverses_id) continue;
+    if (reversedIds.has(tx.id)) continue;
+    return tx;
+  }
+
+  return null;
 }
 
 export function subscribeToBucketTransactions(
