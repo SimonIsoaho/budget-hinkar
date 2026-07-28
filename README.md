@@ -49,6 +49,12 @@ npm run dev
 2. Skicka koden (8 tecken) till din sambo
 3. Din sambo väljer **Gå med med kod** och matar in koden
 
+## Historik (migration)
+
+Om du redan har ett Supabase-projekt, kör SQL-filen
+`supabase/migrations/2026-07-28-bucket-transactions.sql` i SQL Editor.
+Det skapar historiktabellen utan att ändra befintliga saldon.
+
 ## Installera som PWA
 
 - **iPhone (Safari):** Dela → Lägg till på hemskärmen

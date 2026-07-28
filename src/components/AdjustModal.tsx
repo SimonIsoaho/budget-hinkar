@@ -1,6 +1,15 @@
 import { useEffect, useState } from 'react';
-import { formatAmount, parseAmount } from '../lib/format';
-import type { Bucket } from '../lib/types';
+import {
+  formatAmount,
+  formatSignedAmount,
+  formatTransactionDate,
+  parseAmount,
+} from '../lib/format';
+import {
+  fetchBucketTransactions,
+  subscribeToBucketTransactions,
+} from '../lib/transactions';
+import type { Bucket, BucketTransaction } from '../lib/types';
 import { Button } from './Button';
 import styles from './Modal.module.css';
 
@@ -8,7 +17,7 @@ type AdjustModalProps = {
   visible: boolean;
   bucket: Bucket | null;
   onClose: () => void;
-  onAdjust: (bucket: Bucket, delta: number) => Promise<void>;
+  onAdjust: (bucket: Bucket, delta: number, description?: string) => Promise<Bucket>;
   onDelete: (bucket: Bucket) => Promise<void>;
 };
 
@@ -20,18 +29,52 @@ export function AdjustModal({
   onDelete,
 }: AdjustModalProps) {
   const [amount, setAmount] = useState('');
+  const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [transactions, setTransactions] = useState<BucketTransaction[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
 
   useEffect(() => {
     if (!visible) {
       setAmount('');
+      setDescription('');
       setError(null);
+      setTransactions([]);
     }
   }, [visible]);
 
+  useEffect(() => {
+    if (!visible || !bucket) return undefined;
+
+    let cancelled = false;
+    setHistoryLoading(true);
+
+    const load = () => {
+      fetchBucketTransactions(bucket.id)
+        .then((rows) => {
+          if (!cancelled) setTransactions(rows);
+        })
+        .catch(() => {
+          if (!cancelled) setTransactions([]);
+        })
+        .finally(() => {
+          if (!cancelled) setHistoryLoading(false);
+        });
+    };
+
+    load();
+    const unsubscribe = subscribeToBucketTransactions(bucket.id, load);
+
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
+  }, [visible, bucket]);
+
   const handleClose = () => {
     setAmount('');
+    setDescription('');
     setError(null);
     onClose();
   };
@@ -48,8 +91,11 @@ export function AdjustModal({
     setLoading(true);
     setError(null);
     try {
-      await onAdjust(bucket, sign * parsed);
-      handleClose();
+      await onAdjust(bucket, sign * parsed, description);
+      setAmount('');
+      setDescription('');
+      const rows = await fetchBucketTransactions(bucket.id);
+      setTransactions(rows);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Försök igen.');
     } finally {
@@ -86,9 +132,7 @@ export function AdjustModal({
         <h2 id="adjust-modal-title" className={styles.title}>
           {bucket.name}
         </h2>
-        <p style={{ margin: '0 0 var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
-          Saldo: {formatAmount(bucket.balance)}
-        </p>
+        <p className={styles.balance}>Saldo: {formatAmount(bucket.balance)}</p>
 
         <input
           autoFocus
@@ -99,8 +143,14 @@ export function AdjustModal({
           }}
           placeholder="Belopp"
           inputMode="decimal"
+          className={styles.amountInput}
+        />
+
+        <input
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
+          placeholder="Beskrivning (valfritt)"
           className={styles.input}
-          style={{ fontSize: 24, fontWeight: 600, textAlign: 'center' }}
         />
 
         {error && <p className={styles.error}>{error}</p>}
@@ -121,20 +171,37 @@ export function AdjustModal({
           />
         </div>
 
-        <button
-          type="button"
-          onClick={handleDelete}
-          style={{
-            marginTop: 'var(--spacing-lg)',
-            width: '100%',
-            background: 'none',
-            border: 'none',
-            color: 'var(--color-danger)',
-            fontSize: 15,
-            fontWeight: 500,
-            padding: 'var(--spacing-sm)',
-          }}
-        >
+        <section className={styles.history}>
+          <h3 className={styles.historyTitle}>Historik</h3>
+          {historyLoading && transactions.length === 0 ? (
+            <p className={styles.historyEmpty}>Laddar…</p>
+          ) : transactions.length === 0 ? (
+            <p className={styles.historyEmpty}>Inga ändringar ännu</p>
+          ) : (
+            <ul className={styles.historyList}>
+              {transactions.map((tx) => (
+                <li key={tx.id} className={styles.historyItem}>
+                  <div className={styles.historyMain}>
+                    <span
+                      className={[
+                        styles.historyAmount,
+                        tx.direction === 'add' ? styles.historyAdd : styles.historyRemove,
+                      ].join(' ')}
+                    >
+                      {formatSignedAmount(tx.amount, tx.direction)}
+                    </span>
+                    <span className={styles.historyDate}>{formatTransactionDate(tx.created_at)}</span>
+                  </div>
+                  {tx.description && (
+                    <p className={styles.historyDescription}>{tx.description}</p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <button type="button" onClick={handleDelete} className={styles.deleteLink}>
           Radera hinken
         </button>
       </div>

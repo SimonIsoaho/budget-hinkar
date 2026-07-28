@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
-import type { Bucket } from './types';
+import { normalizeDescription } from './format';
+import type { Bucket, BucketTransaction, TransactionDirection } from './types';
 
 export async function fetchBuckets(householdId: string): Promise<Bucket[]> {
   const { data, error } = await supabase
@@ -46,8 +47,11 @@ export async function deleteBucket(bucketId: string): Promise<void> {
 export async function adjustBucketBalance(
   bucket: Bucket,
   delta: number,
-): Promise<Bucket> {
+  description?: string,
+): Promise<{ bucket: Bucket; transaction: BucketTransaction }> {
   const nextBalance = Math.round((bucket.balance + delta) * 100) / 100;
+  const direction: TransactionDirection = delta >= 0 ? 'add' : 'remove';
+  const amount = Math.abs(delta);
 
   const { data, error } = await supabase
     .from('buckets')
@@ -61,10 +65,30 @@ export async function adjustBucketBalance(
 
   if (error) throw error;
 
-  return {
+  const updatedBucket: Bucket = {
     ...(data as Bucket),
     balance: Number(data.balance),
   };
+
+  const { data: txData, error: txError } = await supabase
+    .from('bucket_transactions')
+    .insert({
+      bucket_id: bucket.id,
+      amount,
+      direction,
+      description: normalizeDescription(description),
+    })
+    .select()
+    .single();
+
+  if (txError) throw txError;
+
+  const transaction: BucketTransaction = {
+    ...(txData as BucketTransaction),
+    amount: Number(txData.amount),
+  };
+
+  return { bucket: updatedBucket, transaction };
 }
 
 export function subscribeToBuckets(

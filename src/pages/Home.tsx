@@ -93,10 +93,15 @@ export function HomePage() {
     }
   };
 
-  const handleAdjust = async (bucket: Bucket, delta: number) => {
-    const updated = await adjustBucketBalance(bucket, delta);
+  const handleAdjust = async (
+    bucket: Bucket,
+    delta: number,
+    description?: string,
+  ): Promise<Bucket> => {
+    const { bucket: updated } = await adjustBucketBalance(bucket, delta, description);
     setBuckets((current) => current.map((item) => (item.id === updated.id ? updated : item)));
-    setSelectedBucket(null);
+    setSelectedBucket(updated);
+    return updated;
   };
 
   const handleDelete = async (bucket: Bucket) => {

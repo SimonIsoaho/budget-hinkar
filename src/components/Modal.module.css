@@ -31,6 +31,8 @@
   padding-bottom: var(--spacing-xl);
   width: 100%;
   max-width: 480px;
+  max-height: min(90dvh, 720px);
+  overflow-y: auto;
   z-index: 1;
 }
 
@@ -41,10 +43,15 @@
 }
 
 .title {
-  margin: 0 0 var(--spacing-md);
+  margin: 0 0 var(--spacing-xs);
   font-size: 20px;
   font-weight: 700;
   color: var(--color-text);
+}
+
+.balance {
+  margin: 0 0 var(--spacing-lg);
+  color: var(--color-text-secondary);
 }
 
 .input {
@@ -55,16 +62,31 @@
   font-size: 18px;
   color: var(--color-text);
   background-color: var(--color-background);
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
 }
 
-.input::placeholder {
+.amountInput {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  font-size: 24px;
+  font-weight: 600;
+  text-align: center;
+  color: var(--color-text);
+  background-color: var(--color-background);
+  margin-bottom: var(--spacing-md);
+}
+
+.input::placeholder,
+.amountInput::placeholder {
   color: var(--color-text-secondary);
 }
 
 .actions {
   display: flex;
   gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
 }
 
 .action {
@@ -72,7 +94,86 @@
 }
 
 .error {
-  margin: calc(var(--spacing-md) * -1) 0 var(--spacing-md);
+  margin: 0 0 var(--spacing-md);
   color: var(--color-danger);
   font-size: 14px;
+}
+
+.history {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--spacing-md);
+}
+
+.historyTitle {
+  margin: 0 0 var(--spacing-md);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.historyEmpty {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.historyList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.historyItem {
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.historyItem:last-child {
+  border-bottom: none;
+}
+
+.historyMain {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--spacing-md);
+}
+
+.historyAmount {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.historyAdd {
+  color: var(--color-positive);
+}
+
+.historyRemove {
+  color: var(--color-negative);
+}
+
+.historyDate {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.historyDescription {
+  margin: var(--spacing-xs) 0 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.deleteLink {
+  margin-top: var(--spacing-lg);
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--color-danger);
+  font-size: 15px;
+  font-weight: 500;
+  padding: var(--spacing-sm);
 }
