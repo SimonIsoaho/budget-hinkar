@@ -323,14 +323,14 @@ export function AdjustModal({
 
         <div className={styles.actions}>
           <Button
-            title="Lägg till"
+            title="In"
             onClick={() => applyDelta(1)}
             loading={loading}
             disabled={!online}
             className={styles.action}
           />
           <Button
-            title="Ta bort"
+            title="Ut"
             variant="secondary"
             onClick={() => applyDelta(-1)}
             loading={loading}
