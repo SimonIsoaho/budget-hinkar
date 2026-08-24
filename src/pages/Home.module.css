@@ -6,122 +6,207 @@
 
 .summary {
   margin-bottom: var(--spacing-lg);
+  animation: fadeUp 0.4s ease both;
 }
 
 .householdName {
   margin: 0;
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 800;
+  letter-spacing: -0.03em;
   color: var(--color-text);
 }
 
 .codeLabel {
-  margin-top: var(--spacing-xs);
-  font-size: 15px;
-  color: var(--color-text-secondary);
-  letter-spacing: 1px;
+  display: inline-block;
+  margin-top: var(--spacing-sm);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary-dark);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--color-border);
+  padding: 6px 10px;
+  border-radius: 999px;
 }
 
 .nameButton {
-  display: block;
+  display: inline-flex;
   margin-top: var(--spacing-sm);
   margin-bottom: 0;
-  padding: 0;
+  padding: 6px 0;
   background: none;
   border: none;
   color: var(--color-primary);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   text-align: left;
 }
 
 .totalCard {
+  position: relative;
+  overflow: hidden;
   margin-top: var(--spacing-md);
-  background-color: var(--color-primary-light);
-  border-radius: var(--radius-lg);
+  background: var(--gradient-hero);
+  border-radius: var(--radius-xl);
   padding: var(--spacing-lg);
+  box-shadow: var(--shadow-lg);
+  color: #fff;
+}
+
+.totalCard::after {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -20%;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.18) 0%, transparent 70%);
+  pointer-events: none;
 }
 
 .totalLabel {
-  font-size: 14px;
-  color: var(--color-primary-dark);
+  position: relative;
+  font-size: 13px;
   font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.85;
 }
 
 .totalAmount {
+  position: relative;
   margin-top: var(--spacing-xs);
-  font-size: 28px;
+  font-size: 34px;
   font-weight: 800;
-  color: var(--color-primary-dark);
+  letter-spacing: -0.03em;
 }
 
 .periodCard {
   margin-top: var(--spacing-md);
-  background-color: var(--color-surface);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .periodTitle {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
 }
 
 .periodRange {
   margin-top: var(--spacing-xs);
-  font-size: 13px;
-  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
 }
 
 .periodStats {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
   margin-top: var(--spacing-md);
 }
 
+.periodStat {
+  background: var(--color-background);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+}
+
 .periodStatLabel {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--color-text-secondary);
-  font-weight: 600;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .periodIn {
-  margin-top: 2px;
-  font-size: 18px;
-  font-weight: 700;
+  margin-top: 4px;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   color: var(--color-positive);
 }
 
 .periodOut {
-  margin-top: 2px;
-  font-size: 18px;
-  font-weight: 700;
+  margin-top: 4px;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   color: var(--color-negative);
 }
 
 .activity {
   margin-top: var(--spacing-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
 }
 
-.activityTitle {
-  margin: 0 0 var(--spacing-sm);
+.activityHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 4px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.activityHeaderText {
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: -0.01em;
   color: var(--color-text);
 }
 
+.activityCount {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.activityChevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--color-primary-dark);
+  background: var(--color-primary-light);
+  border-radius: 999px;
+  transform: rotate(0deg);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.activityChevronOpen {
+  transform: rotate(90deg);
+  background: var(--color-primary);
+  color: #fff;
+}
+
 .activityEmpty {
-  margin: 0;
+  margin: var(--spacing-sm) 0 0;
   font-size: 14px;
   color: var(--color-text-secondary);
 }
 
 .activityList {
   list-style: none;
-  margin: 0;
+  margin: var(--spacing-md) 0 0;
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -131,13 +216,19 @@
 .activityItem {
   width: 100%;
   text-align: left;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  border: 1px solid transparent;
   border-radius: var(--radius-md);
   padding: var(--spacing-sm) var(--spacing-md);
   display: flex;
   flex-direction: column;
   gap: 4px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.activityItem:active {
+  background: var(--color-primary-light);
+  border-color: var(--color-border);
 }
 
 .activityMain {
@@ -149,16 +240,17 @@
 }
 
 .activityActor {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--color-text);
 }
 
 .activityAmount {
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .activityBucket {
   color: var(--color-text-secondary);
+  font-weight: 600;
 }
 
 .activityDate {
@@ -166,15 +258,27 @@
   color: var(--color-text-secondary);
 }
 
+.sectionTitle {
+  margin: var(--spacing-lg) 0 var(--spacing-sm);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
 .empty {
   text-align: center;
   padding: var(--spacing-xl) var(--spacing-md);
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
 }
 
 .emptyTitle {
   margin: 0 0 var(--spacing-sm);
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .emptyBody {
@@ -185,7 +289,7 @@
 }
 
 .footer {
-  margin-top: var(--spacing-sm);
+  margin-top: var(--spacing-md);
 }
 
 .leaveButton {
@@ -193,10 +297,11 @@
 }
 
 .headerAction {
-  background: none;
+  background: var(--color-primary-light);
   border: none;
-  color: var(--color-primary);
-  font-weight: 600;
-  font-size: 16px;
-  padding: var(--spacing-sm);
+  color: var(--color-primary-dark);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 999px;
 }

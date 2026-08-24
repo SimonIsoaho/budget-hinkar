@@ -50,6 +50,7 @@ export function HomePage() {
   const [periodIn, setPeriodIn] = useState(0);
   const [periodOut, setPeriodOut] = useState(0);
   const [activity, setActivity] = useState<ActivityItem[]>([]);
+  const [activityExpanded, setActivityExpanded] = useState(false);
   const period = getCurrentPeriod();
   const periodLabel = formatPeriodLabel(period);
 
@@ -57,7 +58,7 @@ export function HomePage() {
     const { start, end } = getCurrentPeriod();
     const [periodTx, recent] = await Promise.all([
       fetchHouseholdTransactionsInRange(householdId, start, end),
-      fetchHouseholdActivity(householdId, 5),
+      fetchHouseholdActivity(householdId, start, end, 5),
     ]);
     const summary = summarizePeriodCashflow(periodTx);
     setPeriodIn(summary.incoming);
@@ -249,11 +250,11 @@ export function HomePage() {
             <div className={styles.periodTitle}>Denna period</div>
             <div className={styles.periodRange}>{periodLabel}</div>
             <div className={styles.periodStats}>
-              <div>
+              <div className={styles.periodStat}>
                 <div className={styles.periodStatLabel}>In</div>
                 <div className={styles.periodIn}>{formatAmount(periodIn)}</div>
               </div>
-              <div>
+              <div className={styles.periodStat}>
                 <div className={styles.periodStatLabel}>Ut</div>
                 <div className={styles.periodOut}>{formatAmount(periodOut)}</div>
               </div>
@@ -261,38 +262,62 @@ export function HomePage() {
           </div>
 
           <section className={styles.activity}>
-            <h3 className={styles.activityTitle}>Senaste</h3>
-            {activity.length === 0 ? (
-              <p className={styles.activityEmpty}>Inga ändringar ännu</p>
-            ) : (
-              <ul className={styles.activityList}>
-                {activity.map((item) => (
-                  <li key={item.id}>
-                    <button
-                      type="button"
-                      className={styles.activityItem}
-                      onClick={() => openActivityBucket(item)}
-                    >
-                      <span className={styles.activityMain}>
-                        <span className={styles.activityActor}>{item.actor_name ?? 'Okänd'}</span>
-                        <span
-                          className={[
-                            styles.activityAmount,
-                            item.direction === 'add' ? styles.periodIn : styles.periodOut,
-                          ].join(' ')}
-                        >
-                          {formatSignedAmount(item.amount, item.direction)}
+            <button
+              type="button"
+              className={styles.activityHeader}
+              onClick={() => setActivityExpanded((open) => !open)}
+              aria-expanded={activityExpanded}
+            >
+              <span className={styles.activityHeaderText}>
+                Senaste
+                {activity.length > 0 && (
+                  <span className={styles.activityCount}> ({activity.length})</span>
+                )}
+              </span>
+              <span
+                className={[
+                  styles.activityChevron,
+                  activityExpanded ? styles.activityChevronOpen : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                aria-hidden="true"
+              >
+                ›
+              </span>
+            </button>
+            {activityExpanded &&
+              (activity.length === 0 ? (
+                <p className={styles.activityEmpty}>Inga ändringar denna period</p>
+              ) : (
+                <ul className={styles.activityList}>
+                  {activity.map((item) => (
+                    <li key={item.id}>
+                      <button
+                        type="button"
+                        className={styles.activityItem}
+                        onClick={() => openActivityBucket(item)}
+                      >
+                        <span className={styles.activityMain}>
+                          <span className={styles.activityActor}>{item.actor_name ?? 'Okänd'}</span>
+                          <span
+                            className={[
+                              styles.activityAmount,
+                              item.direction === 'add' ? styles.periodIn : styles.periodOut,
+                            ].join(' ')}
+                          >
+                            {formatSignedAmount(item.amount, item.direction)}
+                          </span>
+                          <span className={styles.activityBucket}>{item.bucket_name}</span>
                         </span>
-                        <span className={styles.activityBucket}>{item.bucket_name}</span>
-                      </span>
-                      <span className={styles.activityDate}>
-                        {formatTransactionDate(item.created_at)}
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
+                        <span className={styles.activityDate}>
+                          {formatTransactionDate(item.created_at)}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ))}
           </section>
         </div>
 
@@ -304,9 +329,12 @@ export function HomePage() {
             </p>
           </div>
         ) : (
-          buckets.map((bucket) => (
-            <BucketCard key={bucket.id} bucket={bucket} onPress={() => setSelectedBucket(bucket)} />
-          ))
+          <>
+            <h3 className={styles.sectionTitle}>Hinkar</h3>
+            {buckets.map((bucket) => (
+              <BucketCard key={bucket.id} bucket={bucket} onPress={() => setSelectedBucket(bucket)} />
+            ))}
+          </>
         )}
 
         <div className={styles.footer}>

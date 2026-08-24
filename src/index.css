@@ -1,16 +1,30 @@
 :root {
-  --color-background: #f4f7f5;
+  --color-background: #eef4f0;
+  --color-background-accent: #dceee4;
   --color-surface: #ffffff;
+  --color-surface-elevated: rgba(255, 255, 255, 0.92);
   --color-primary: #1b6b4a;
-  --color-primary-dark: #145239;
+  --color-primary-dark: #0f4a32;
   --color-primary-light: #e8f3ed;
-  --color-text: #1a1f1c;
-  --color-text-secondary: #5c6b63;
-  --color-border: #d8e3dc;
+  --color-primary-glow: rgba(27, 107, 74, 0.22);
+  --color-text: #122018;
+  --color-text-secondary: #5a6d63;
+  --color-border: rgba(20, 82, 57, 0.12);
   --color-danger: #c0392b;
   --color-danger-light: #fdecea;
-  --color-positive: #1b6b4a;
+  --color-positive: #168a5c;
   --color-negative: #c0392b;
+
+  --gradient-primary: linear-gradient(135deg, #1f8f62 0%, #145239 100%);
+  --gradient-hero: linear-gradient(145deg, #1a7a54 0%, #0f4a32 55%, #0c3d29 100%);
+  --gradient-page: radial-gradient(circle at 0% 0%, #dceee4 0%, transparent 45%),
+    radial-gradient(circle at 100% 10%, rgba(27, 107, 74, 0.12) 0%, transparent 40%),
+    linear-gradient(180deg, #eef4f0 0%, #f7faf8 100%);
+
+  --shadow-sm: 0 2px 8px rgba(18, 32, 24, 0.06);
+  --shadow-md: 0 8px 24px rgba(18, 32, 24, 0.08);
+  --shadow-lg: 0 16px 40px rgba(18, 32, 24, 0.12);
+  --shadow-primary: 0 10px 28px rgba(27, 107, 74, 0.28);
 
   --spacing-xs: 4px;
   --spacing-sm: 8px;
@@ -18,23 +32,21 @@
   --spacing-lg: 24px;
   --spacing-xl: 32px;
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 26px;
 
   font-family:
+    'Plus Jakarta Sans',
     -apple-system,
     BlinkMacSystemFont,
     'Segoe UI',
-    Roboto,
-    Helvetica,
-    Arial,
     sans-serif;
   line-height: 1.5;
   font-weight: 400;
   color: var(--color-text);
-  background-color: var(--color-background);
+  background: var(--gradient-page);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -50,6 +62,8 @@
 body {
   margin: 0;
   min-height: 100dvh;
+  background: var(--gradient-page);
+  background-attachment: fixed;
 }
 
 #root {
@@ -57,7 +71,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -66,7 +81,8 @@ button {
 }
 
 input:focus-visible,
-button:focus-visible {
+button:focus-visible,
+select:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
@@ -74,6 +90,17 @@ button:focus-visible {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

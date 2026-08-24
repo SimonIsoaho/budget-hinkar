@@ -15,18 +15,40 @@ function mapTransaction(row: Record<string, unknown>): BucketTransaction {
   };
 }
 
+type TransactionRange = { start: Date; end: Date } | 'all';
+
 export async function fetchBucketTransactions(
   bucketId: string,
+  range: TransactionRange = 'all',
 ): Promise<BucketTransaction[]> {
-  const { data, error } = await supabase
-    .from('bucket_transactions')
-    .select('*')
-    .eq('bucket_id', bucketId)
-    .order('created_at', { ascending: false });
+  let query = supabase.from('bucket_transactions').select('*').eq('bucket_id', bucketId);
+
+  if (range !== 'all') {
+    query = query
+      .gte('created_at', range.start.toISOString())
+      .lte('created_at', range.end.toISOString());
+  }
+
+  const { data, error } = await query.order('created_at', { ascending: false });
 
   if (error) throw error;
 
   return (data ?? []).map((row) => mapTransaction(row as Record<string, unknown>));
+}
+
+export async function hasBucketTransactionsBefore(
+  bucketId: string,
+  before: Date,
+): Promise<boolean> {
+  const { count, error } = await supabase
+    .from('bucket_transactions')
+    .select('id', { count: 'exact', head: true })
+    .eq('bucket_id', bucketId)
+    .lt('created_at', before.toISOString());
+
+  if (error) throw error;
+
+  return (count ?? 0) > 0;
 }
 
 export async function fetchHouseholdTransactionsInRange(
@@ -49,12 +71,16 @@ export async function fetchHouseholdTransactionsInRange(
 
 export async function fetchHouseholdActivity(
   householdId: string,
+  start: Date,
+  end: Date,
   limit = 5,
 ): Promise<ActivityItem[]> {
   const { data, error } = await supabase
     .from('bucket_transactions')
     .select('*, buckets!inner(name, household_id)')
     .eq('buckets.household_id', householdId)
+    .gte('created_at', start.toISOString())
+    .lte('created_at', end.toISOString())
     .order('created_at', { ascending: false })
     .limit(limit);
 

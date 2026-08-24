@@ -11,10 +11,12 @@ import {
   parseAmount,
 } from '../lib/format';
 import { useOnline } from '../lib/online';
+import { getCurrentPeriod } from '../lib/period';
 import { getDisplayName, setDisplayName } from '../lib/storage';
 import {
   fetchBucketTransactions,
   getUndoableTransaction,
+  hasBucketTransactionsBefore,
   subscribeToBucketTransactions,
 } from '../lib/transactions';
 import type { Bucket, BucketTransaction, HistoryInsertPayload } from '../lib/types';
@@ -52,6 +54,8 @@ export function AdjustModal({
   const [pendingHistory, setPendingHistory] = useState<HistoryInsertPayload | null>(null);
   const [transactions, setTransactions] = useState<BucketTransaction[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [showAllHistory, setShowAllHistory] = useState(false);
+  const [hasOlderTransactions, setHasOlderTransactions] = useState(false);
 
   useEffect(() => {
     if (!visible) {
@@ -60,6 +64,8 @@ export function AdjustModal({
       setError(null);
       setPendingHistory(null);
       setTransactions([]);
+      setShowAllHistory(false);
+      setHasOlderTransactions(false);
       return;
     }
 
@@ -74,33 +80,48 @@ export function AdjustModal({
     let cancelled = false;
     setHistoryLoading(true);
 
-    const load = () => {
-      fetchBucketTransactions(bucket.id)
-        .then((rows) => {
-          if (!cancelled) setTransactions(rows);
-        })
-        .catch(() => {
-          if (!cancelled) setTransactions([]);
-        })
-        .finally(() => {
-          if (!cancelled) setHistoryLoading(false);
-        });
+    const load = async () => {
+      try {
+        const period = getCurrentPeriod();
+        const range = showAllHistory ? 'all' : period;
+        const rows = await fetchBucketTransactions(bucket.id, range);
+        if (cancelled) return;
+
+        setTransactions(rows);
+
+        if (!showAllHistory) {
+          const older = await hasBucketTransactionsBefore(bucket.id, period.start);
+          if (!cancelled) setHasOlderTransactions(older);
+        } else if (!cancelled) {
+          setHasOlderTransactions(false);
+        }
+      } catch {
+        if (!cancelled) {
+          setTransactions([]);
+          setHasOlderTransactions(false);
+        }
+      } finally {
+        if (!cancelled) setHistoryLoading(false);
+      }
     };
 
     load();
-    const unsubscribe = subscribeToBucketTransactions(bucket.id, load);
+    const unsubscribe = subscribeToBucketTransactions(bucket.id, () => {
+      load().catch(() => undefined);
+    });
 
     return () => {
       cancelled = true;
       unsubscribe();
     };
-  }, [visible, bucket]);
+  }, [visible, bucket, showAllHistory]);
 
   const handleClose = () => {
     setAmount('');
     setDescription('');
     setError(null);
     setPendingHistory(null);
+    setShowAllHistory(false);
     onClose();
   };
 
@@ -117,8 +138,14 @@ export function AdjustModal({
   };
 
   const refreshHistory = async (bucketId: string) => {
-    const rows = await fetchBucketTransactions(bucketId);
+    const period = getCurrentPeriod();
+    const range = showAllHistory ? 'all' : period;
+    const rows = await fetchBucketTransactions(bucketId, range);
     setTransactions(rows);
+
+    if (!showAllHistory) {
+      setHasOlderTransactions(await hasBucketTransactionsBefore(bucketId, period.start));
+    }
   };
 
   const applyDelta = async (sign: 1 | -1) => {
@@ -317,7 +344,9 @@ export function AdjustModal({
           {historyLoading && transactions.length === 0 ? (
             <p className={styles.historyEmpty}>Laddar…</p>
           ) : transactions.length === 0 ? (
-            <p className={styles.historyEmpty}>Inga ändringar ännu</p>
+            <p className={styles.historyEmpty}>
+              {showAllHistory ? 'Inga ändringar ännu' : 'Inga ändringar denna period'}
+            </p>
           ) : (
             <ul className={styles.historyList}>
               {transactions.map((tx) => (
@@ -353,6 +382,24 @@ export function AdjustModal({
                 </li>
               ))}
             </ul>
+          )}
+          {!showAllHistory && hasOlderTransactions && (
+            <button
+              type="button"
+              className={styles.historyToggle}
+              onClick={() => setShowAllHistory(true)}
+            >
+              Visa äldre transaktioner
+            </button>
+          )}
+          {showAllHistory && (
+            <button
+              type="button"
+              className={styles.historyToggle}
+              onClick={() => setShowAllHistory(false)}
+            >
+              Visa endast denna period
+            </button>
           )}
         </section>
 
