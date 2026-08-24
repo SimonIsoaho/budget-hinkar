@@ -17,9 +17,9 @@
 .backdrop {
   position: absolute;
   inset: 0;
-  background-color: rgba(12, 32, 24, 0.45);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(8, 28, 20, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: none;
   cursor: pointer;
 }
@@ -36,8 +36,9 @@
   max-height: min(90dvh, 720px);
   overflow-y: auto;
   z-index: 1;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 -8px 40px rgba(18, 32, 24, 0.15);
   animation: fadeUp 0.25s ease both;
+  border-top: 1px solid var(--glass-border);
 }
 
 .sheet::before {

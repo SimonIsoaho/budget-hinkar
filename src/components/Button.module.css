@@ -16,7 +16,7 @@
 .primary {
   background: var(--gradient-primary);
   color: #fff;
-  box-shadow: var(--shadow-primary);
+  box-shadow: var(--shadow-primary), var(--shadow-inset);
 }
 
 .secondary {

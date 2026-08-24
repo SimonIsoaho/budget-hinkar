@@ -232,15 +232,22 @@ export function HomePage() {
     >
       <div className={styles.list}>
         <div className={styles.summary}>
-          <h2 className={styles.householdName}>{household?.name}</h2>
-          <p className={styles.codeLabel}>Delningskod: {household?.code}</p>
-          <button
-            type="button"
-            className={styles.nameButton}
-            onClick={() => setShowNameModal(true)}
-          >
-            {displayName ? `Ditt namn: ${displayName}` : 'Ange ditt namn'}
-          </button>
+          <div className={styles.metaStrip}>
+            <div className={styles.householdRow}>
+              <h2 className={styles.householdName}>{household?.name}</h2>
+              <p className={styles.codeLabel} aria-label={`Delningskod ${household?.code}`}>
+                <span className={styles.codePrefix}>Kod</span>
+                <span className={styles.codeValue}>{household?.code}</span>
+              </p>
+            </div>
+            <button
+              type="button"
+              className={styles.nameButton}
+              onClick={() => setShowNameModal(true)}
+            >
+              {displayName ? `Ditt namn: ${displayName}` : 'Ange ditt namn'}
+            </button>
+          </div>
           <div className={styles.totalCard}>
             <div className={styles.totalLabel}>Totalt i hinkarna</div>
             <div className={styles.totalAmount}>{formatAmount(totalBalance)}</div>
@@ -331,8 +338,13 @@ export function HomePage() {
         ) : (
           <>
             <h3 className={styles.sectionTitle}>Hinkar</h3>
-            {buckets.map((bucket) => (
-              <BucketCard key={bucket.id} bucket={bucket} onPress={() => setSelectedBucket(bucket)} />
+            {buckets.map((bucket, index) => (
+              <BucketCard
+                key={bucket.id}
+                bucket={bucket}
+                index={index}
+                onPress={() => setSelectedBucket(bucket)}
+              />
             ))}
           </>
         )}

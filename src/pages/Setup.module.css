@@ -13,17 +13,40 @@
   animation: fadeUp 0.45s ease both;
 }
 
-.emoji {
+.logo {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
+  gap: 10px;
   width: 88px;
   height: 88px;
-  font-size: 44px;
   margin-bottom: var(--spacing-md);
+  padding-bottom: 18px;
   background: var(--gradient-hero);
   border-radius: 28px;
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-lg), var(--shadow-primary);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.logoBar {
+  display: block;
+  width: 14px;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.logoBar:nth-child(1) {
+  height: 28px;
+  opacity: 0.85;
+}
+
+.logoBar:nth-child(2) {
+  height: 42px;
+}
+
+.logoBar:nth-child(3) {
+  height: 22px;
+  opacity: 0.85;
 }
 
 .title {

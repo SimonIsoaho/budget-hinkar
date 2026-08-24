@@ -1,22 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
   <defs>
-    <linearGradient id="bg" x1="4" y1="3" x2="28" y2="29" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#2A8A61"/>
-      <stop offset="1" stop-color="#145239"/>
-    </linearGradient>
-    <linearGradient id="mark" x1="16" y1="8" x2="16" y2="24" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FFFFFF"/>
-      <stop offset="1" stop-color="#E2F0EA"/>
+    <linearGradient id="bg" x1="6" y1="2" x2="26" y2="30" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#24b577" />
+      <stop offset="1" stop-color="#145239" />
     </linearGradient>
   </defs>
-  <rect width="32" height="32" rx="7" fill="url(#bg)"/>
-  <text
-    x="16"
-    y="22"
-    text-anchor="middle"
-    font-size="22"
-    font-weight="700"
-    fill="url(#mark)"
-    font-family="Arial, Helvetica, sans-serif"
-  >$</text>
+
+  <rect width="32" height="32" rx="7" fill="url(#bg)" />
+
+  <rect x="8" y="16" width="3.5" height="7" rx="1.75" fill="#ffffff" opacity="0.88" />
+  <rect x="14.25" y="13" width="3.5" height="10" rx="1.75" fill="#ffffff" />
+  <rect x="20.5" y="17" width="3.5" height="6" rx="1.75" fill="#ffffff" opacity="0.88" />
 </svg>

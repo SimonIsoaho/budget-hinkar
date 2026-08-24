@@ -1,25 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
   <defs>
-    <linearGradient id="bg" x1="64" y1="48" x2="448" y2="464" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#2A8A61"/>
-      <stop offset="1" stop-color="#145239"/>
-    </linearGradient>
-    <linearGradient id="mark" x1="256" y1="120" x2="256" y2="392" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FFFFFF"/>
-      <stop offset="1" stop-color="#E2F0EA"/>
+    <linearGradient id="bg" x1="96" y1="32" x2="416" y2="480" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#24b577" />
+      <stop offset="0.5" stop-color="#1a7a54" />
+      <stop offset="1" stop-color="#145239" />
     </linearGradient>
   </defs>
 
-  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
-  <circle cx="256" cy="256" r="160" fill="#FFFFFF" opacity="0.06"/>
+  <rect width="512" height="512" rx="112" fill="url(#bg)" />
 
-  <text
-    x="256"
-    y="338"
-    text-anchor="middle"
-    font-size="320"
-    font-weight="700"
-    fill="url(#mark)"
-    font-family="Arial, Helvetica, sans-serif"
-  >$</text>
+  <rect x="152" y="248" width="56" height="112" rx="28" fill="#ffffff" opacity="0.88" />
+  <rect x="228" y="200" width="56" height="160" rx="28" fill="#ffffff" />
+  <rect x="304" y="272" width="56" height="88" rx="28" fill="#ffffff" opacity="0.88" />
 </svg>

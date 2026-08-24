@@ -15,16 +15,21 @@
   --color-positive: #168a5c;
   --color-negative: #c0392b;
 
-  --gradient-primary: linear-gradient(135deg, #1f8f62 0%, #145239 100%);
-  --gradient-hero: linear-gradient(145deg, #1a7a54 0%, #0f4a32 55%, #0c3d29 100%);
-  --gradient-page: radial-gradient(circle at 0% 0%, #dceee4 0%, transparent 45%),
-    radial-gradient(circle at 100% 10%, rgba(27, 107, 74, 0.12) 0%, transparent 40%),
-    linear-gradient(180deg, #eef4f0 0%, #f7faf8 100%);
+  --gradient-primary: linear-gradient(135deg, #22a06b 0%, #145239 100%);
+  --gradient-hero: linear-gradient(155deg, #24b577 0%, #1a7a54 35%, #0f4a32 70%, #0a3524 100%);
+  --gradient-page: radial-gradient(ellipse 80% 50% at 20% -10%, rgba(34, 160, 107, 0.18) 0%, transparent 55%),
+    radial-gradient(circle at 100% 0%, rgba(27, 107, 74, 0.14) 0%, transparent 42%),
+    radial-gradient(circle at 50% 100%, rgba(220, 238, 228, 0.9) 0%, transparent 50%),
+    linear-gradient(180deg, #e8f2ec 0%, #f4f9f6 45%, #eef4f0 100%);
 
-  --shadow-sm: 0 2px 8px rgba(18, 32, 24, 0.06);
-  --shadow-md: 0 8px 24px rgba(18, 32, 24, 0.08);
-  --shadow-lg: 0 16px 40px rgba(18, 32, 24, 0.12);
-  --shadow-primary: 0 10px 28px rgba(27, 107, 74, 0.28);
+  --glass-border: rgba(255, 255, 255, 0.65);
+  --glass-surface: rgba(255, 255, 255, 0.78);
+
+  --shadow-sm: 0 2px 10px rgba(18, 32, 24, 0.05);
+  --shadow-md: 0 10px 30px rgba(18, 32, 24, 0.07);
+  --shadow-lg: 0 20px 48px rgba(18, 32, 24, 0.11);
+  --shadow-primary: 0 12px 32px rgba(27, 107, 74, 0.32);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.22);
 
   --spacing-xs: 4px;
   --spacing-sm: 8px;

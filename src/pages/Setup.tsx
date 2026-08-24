@@ -56,9 +56,11 @@ export function SetupPage() {
     <Layout title="Kom igång">
       <div className={styles.content}>
         <div className={styles.hero}>
-          <span className={styles.emoji} aria-hidden="true">
-            🪣
-          </span>
+          <div className={styles.logo} aria-hidden="true">
+            <span className={styles.logoBar} />
+            <span className={styles.logoBar} />
+            <span className={styles.logoBar} />
+          </div>
           <h2 className={styles.title}>Budgethinkar</h2>
           <p className={styles.subtitle}>
             Håll koll på gemensamma spar-hinkar tillsammans. Skapa ett hushåll och dela koden med

@@ -13,7 +13,7 @@ export default defineConfig({
         short_name: 'Budgethinkar',
         description: 'Gemensamma budgethinkar för dig och din sambo',
         theme_color: '#145239',
-        background_color: '#F4F7F5',
+        background_color: '#eef4f0',
         display: 'standalone',
         start_url: '/',
         icons: [
